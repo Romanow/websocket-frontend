@@ -4,8 +4,12 @@ html, body {
     padding-top: 00px;
 }
 
-.content-size {
+.content {
     width: 640px;
+}
+
+.status {
+    width: 250px;
 }
 
 .header-text {
@@ -18,7 +22,7 @@ html, body {
 }
 
 .chart-height {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 250px);
     overflow: scroll;
 }
 
