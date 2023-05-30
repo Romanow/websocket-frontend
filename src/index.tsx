@@ -1,29 +1,12 @@
-import {Client} from "@stomp/stompjs";
+import React from "react";
+import {createRoot} from "react-dom/client";
 
-const log = (message: string) => () => {
-    console.log(message)
-}
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
-const client = new Client({
-    brokerURL: "ws://localhost:8080/ws",
-    connectHeaders: {
-        "X-Authorization": window.btoa("test:test")
-    },
-    reconnectDelay: 0,
-    onConnect: () => {
-        client.subscribe("/queue/reply", message =>
-            console.log(`Application received: ${message.body}`)
-        );
-        client.subscribe("/user/queue/reply", message =>
-            console.log(`User received: ${message.body}`)
-        );
-        client.subscribe("/user/queue/errors", message =>
-            console.log(`Error received: ${message.body}`)
-        );
-        client.publish({destination: "/chat/request", body: "First Message"});
-    },
-    onStompError: log("Error"),
-    onDisconnect: log("Disconnected")
-});
+import "./index.css";
+import MainPage from "./pages/MainPage";
 
-client.activate();
+const container = document.getElementById("root");
+const root = createRoot(container!);
+root.render(<MainPage/>);

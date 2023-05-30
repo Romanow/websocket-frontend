@@ -4,16 +4,7 @@ html, body {
     padding-top: 00px;
 }
 
-.content {
-    width: 640px;
-}
-
-.status {
-    width: 250px;
-}
-
-.header-text {
-    font-size: 2em;
+.header-color {
     color: #CED4DA;
 }
 
@@ -21,13 +12,25 @@ html, body {
     fill: #CED4DA;
 }
 
-.chart-height {
-    height: calc(100vh - 250px);
-    overflow: scroll;
+.blink {
+    animation: blinker 3s infinite;
 }
 
-.blink {
-    animation: blinker 1s infinite;
+.connection-box,
+.user-box {
+    height: 212px;
+    margin-top: 1rem !important;
+}
+
+.user-list {
+    height: 132px;
+    margin: 15px;
+    list-style: none;
+}
+
+.user-list > .list-item {
+    border: 1px;
+    margin: 0 15px;
 }
 
 @keyframes blinker {
