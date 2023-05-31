@@ -1,20 +1,20 @@
 version: "3.9"
 services:
-  websocekt-service:
-    image: romanowalex/websocekt-service:v1.0
-    container_name: websocekt-service
+  websocket-service:
+    image: romanowalex/websocket-service:v1.0
+    container_name: websocket-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
 
-  websocekt-frontend:
+  websocket-frontend:
     build: .
-    image: romanowalex/websocekt-frontend:v1.0
-    container_name: websocekt-frontend
+    image: romanowalex/websocket-frontend:v1.0
+    container_name: websocket-frontend
     environment:
-      BACKEND_HOST: websocekt-service
+      BACKEND_HOST: websocket-service
     ports:
       - "80:80"
     depends_on:
-      - websocekt-service
+      - websocket-service
