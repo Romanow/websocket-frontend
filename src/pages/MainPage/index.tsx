@@ -1,33 +1,32 @@
 import React, {FC, useEffect, useState} from "react";
-import {StompSocketState} from "@stomp/stompjs";
+import _ from "lodash";
 
 import {ReactComponent as Logo} from "../../images/websocket.svg";
 import useWebSocket from "../../hooks/useWebSocket";
+import useSubscription from "../../hooks/useSubscription";
+import useErrorSubscription from "../../hooks/useErrorSubscription";
+import {ConnectionState} from "../../types";
 import "../../index.css";
 
 const MainPage: FC = () => {
-    const {state, connect, subscribe, sendMessage, controlMessage, disconnect} = useWebSocket()
-    const [users, setUsers] = useState<string[]>([])
-
-    useEffect(() => {
-        subscribe("/queue/users").then(data => setUsers(JSON.parse(data)))
-        subscribe("/user/queue/users").then(data => setUsers(JSON.parse(data)))
-    }, [users])
-
-    // subscribe("/user/queue/errors")
-    //     .then(data => console.log(`Error received: ${data}`))
-
-    const handleClick = () => {
-        if (state !== StompSocketState.OPEN) {
-            connect(address, login, "test")
-                .then(() => controlMessage("/queue/users", ""))
-        } else {
-            disconnect()
-        }
-    }
-
+    const [connectionState, toggleConnectionState] = useState(false)
     const [address, setAddress] = useState("ws://localhost:8080/ws");
     const [login, setLogin] = useState("test")
+
+    const {state, client} = useWebSocket(connectionState, address, login, "test")
+    const [users] = useSubscription<string[]>("/queue/users", state, client)
+    const [initUsers] = useSubscription<string[]>("/user/queue/users", state, client)
+    useErrorSubscription(state, client)
+
+    useEffect(() => {
+        if (state === ConnectionState.CONNECTED) {
+            client?.publish({destination: "/chat/users"})
+        }
+    }, [state])
+
+    const handleClick = () => toggleConnectionState(state !== ConnectionState.CONNECTED)
+
+    const activeUsers = _.filter(users || initUsers || [], u => u !== login)
     return (
         <div>
             <nav className="navbar bg-primary text-center justify-content-around">
@@ -38,7 +37,7 @@ const MainPage: FC = () => {
                     <div className="fs-4 header-color">WebSocket Chat</div>
                 </div>
                 <div className="col-4 fs-4 text-end header-color">
-                    {state !== StompSocketState.OPEN
+                    {state !== ConnectionState.CONNECTED
                         ? (<div><i className="bi bi-circle-fill text-danger blink"/>&nbsp;Disconnected</div>)
                         : (<div><i className="bi bi-circle-fill text-success"/>&nbsp;Connected</div>)}
                 </div>
@@ -49,7 +48,13 @@ const MainPage: FC = () => {
                         <div className="rounded-2 border user-box">
                             <div className="text-center fs-4 my-3">USERS</div>
                             <ul className="list-group overflow-auto user-list border-start border-2 border-warning rounded-0">
-                                {users.map(user =>
+                                {state === ConnectionState.CONNECTED &&
+                                    <li className="list-item d-flex align-items-center">
+                                        <i className="bi bi-circle-fill text-success"/>
+                                        <button className="btn btn-link" disabled>{login}</button>
+                                    </li>
+                                }
+                                {activeUsers.map(user =>
                                     <li key={user} className="list-item d-flex align-items-center">
                                         <i className="bi bi-circle-fill text-success"/>
                                         <button className="btn btn-link">{user}</button>
@@ -87,8 +92,8 @@ const MainPage: FC = () => {
                                 </div>
                                 <div className="row my-2 justify-content-center">
                                     <div className="col-4">
-                                        <button className="btn btn-primary" onClick={handleClick}>
-                                            {state !== StompSocketState.OPEN ? "Connect" : "Disconnect"}
+                                        <button className="btn btn-primary" type="button" onClick={handleClick}>
+                                            {state !== ConnectionState.CONNECTED ? "Connect" : "Disconnect"}
                                         </button>
                                     </div>
                                 </div>
