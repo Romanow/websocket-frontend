@@ -7,7 +7,7 @@ const useErrorSubscription = (state?: ConnectionState, client?: Client) => {
         if (state === ConnectionState.CONNECTED) {
             client!!.subscribe("/user/chat/errors", message => console.error(message))
         }
-    }, [state])
+    }, [state])  // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export default useErrorSubscription;

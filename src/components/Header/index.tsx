@@ -9,7 +9,7 @@ const Header: FC<HeaderProps> = ({isConnected}) => {
     return (
         <nav className="navbar bg-primary text-center justify-content-around">
             <div className="col-4 d-inline-flex align-items-center">
-                <a className="navbar-brand" href="#">
+                <a className="navbar-brand" href="/">
                     <Logo width="42" height="42" className="header-icon"/>
                 </a>
                 <div className="fs-4 header-color">WebSocket Chat</div>

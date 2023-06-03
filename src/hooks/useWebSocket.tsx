@@ -25,23 +25,13 @@ const useWebSocket = (connectionState: boolean, address: string, login: string, 
             setClient(client)
             setState(client.webSocket?.readyState)
         }
-    }, [connectionState])
+    }, [connectionState])  // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!connectionState && state === ConnectionState.CONNECTED) {
             client?.deactivate()
         }
-    }, [connectionState])
-
-    // const sendMessage = (msg: string) => controlMessage("/chat/request", msg)
-    //
-    // const controlMessage = (dest: string, msg: string) => {
-    //     client?.publish({destination: dest, body: msg})
-    // }
-    //
-    // const subscribe = (dest: string): Promise<string> => {
-    //     return new Promise<string>((resolve) => subscriptions.push({dest, resolve}))
-    // }
+    }, [connectionState])  // eslint-disable-line react-hooks/exhaustive-deps
 
     return {state, client}
 }

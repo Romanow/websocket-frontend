@@ -35,21 +35,21 @@ const MainPage: FC = () => {
             setMessage("")
             setMessages([])
         }
-    }, [state])
+    }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         console.log(`Init messages: [${initMessages}]`)
         if (isConnected && _.isEmpty(messages) && !_.isEmpty(initMessages)) {
             setMessages(initMessages!!)
         }
-    }, [initMessages])
+    }, [initMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         console.log(`New message: [${newMessage}]`)
         if (newMessage) {
             setMessages([...messages, newMessage!!])
         }
-    }, [newMessage])
+    }, [newMessage]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         messagesRef.current?.scrollIntoView({behavior: "smooth"})

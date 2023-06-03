@@ -1,5 +1,4 @@
 import React, {FC} from "react";
-import MessageItem from "../MessageItem";
 
 type UserProps = {
     name: string

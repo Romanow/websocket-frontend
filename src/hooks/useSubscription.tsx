@@ -12,7 +12,7 @@ const useSubscription = <T, >(dest: string, state?: ConnectionState, client?: Cl
                 setItems(JSON.parse(message.body))
             })
         }
-    }, [state])
+    }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return [items]
 }
