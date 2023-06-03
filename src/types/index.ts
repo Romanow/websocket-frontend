@@ -1,6 +1,7 @@
-export type Subscription = {
-    dest: string,
-    resolve: (value: string | PromiseLike<string>) => void
+export type Message = {
+    message: string,
+    time: string
+    user: string
 }
 
 export enum ConnectionState {

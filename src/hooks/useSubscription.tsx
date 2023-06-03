@@ -8,7 +8,7 @@ const useSubscription = <T, >(dest: string, state?: ConnectionState, client?: Cl
     useEffect(() => {
         if (state === ConnectionState.CONNECTED) {
             client!!.subscribe(dest, message => {
-                console.log(`New items: ${message.body}`)
+                console.log(`Received items on (${dest}): ${message.body}`)
                 setItems(JSON.parse(message.body))
             })
         }

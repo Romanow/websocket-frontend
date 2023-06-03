@@ -1,73 +1,104 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useRef, useState} from "react";
 import _ from "lodash";
 
-import {ReactComponent as Logo} from "../../images/websocket.svg";
 import useWebSocket from "../../hooks/useWebSocket";
 import useSubscription from "../../hooks/useSubscription";
 import useErrorSubscription from "../../hooks/useErrorSubscription";
-import {ConnectionState} from "../../types";
+import {ConnectionState, Message} from "../../types";
+import MessageItem from "../../components/MessageItem";
+import Header from "../../components/Header";
+import User from "../../components/User";
 import "../../index.css";
 
 const MainPage: FC = () => {
+    const messagesRef = useRef<HTMLDivElement>(null)
     const [connectionState, toggleConnectionState] = useState(false)
-    const [address, setAddress] = useState("ws://localhost:8080/ws");
     const [login, setLogin] = useState("test")
+    const [address, setAddress] = useState("ws://localhost:8080/ws");
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState<Message[]>([]);
 
     const {state, client} = useWebSocket(connectionState, address, login, "test")
+
+    const [newMessage] = useSubscription<Message>("/queue/message", state, client)
+    const [initMessages] = useSubscription<Message[]>("/user/queue/init/messages", state, client)
+
     const [users] = useSubscription<string[]>("/queue/users", state, client)
-    const [initUsers] = useSubscription<string[]>("/user/queue/users", state, client)
+    const [initUsers] = useSubscription<string[]>("/user/queue/init/users", state, client)
     useErrorSubscription(state, client)
 
     useEffect(() => {
         if (state === ConnectionState.CONNECTED) {
-            client?.publish({destination: "/chat/users"})
+            client?.publish({destination: "/chat/init/users"})
+            client?.publish({destination: "/chat/init/messages"})
+        } else {
+            setMessage("")
+            setMessages([])
         }
     }, [state])
 
-    const handleClick = () => toggleConnectionState(state !== ConnectionState.CONNECTED)
+    useEffect(() => {
+        console.log(`Init messages: [${initMessages}]`)
+        if (isConnected && _.isEmpty(messages) && !_.isEmpty(initMessages)) {
+            setMessages(initMessages!!)
+        }
+    }, [initMessages])
 
-    const activeUsers = _.filter(users || initUsers || [], u => u !== login)
+    useEffect(() => {
+        console.log(`New message: [${newMessage}]`)
+        if (newMessage) {
+            setMessages([...messages, newMessage!!])
+        }
+    }, [newMessage])
+
+    useEffect(() => {
+        messagesRef.current?.scrollIntoView({behavior: "smooth"})
+    }, [messages]);
+
+    const isConnected = state === ConnectionState.CONNECTED;
+    const handleClick = () => toggleConnectionState(!isConnected)
+    const sendMessage = () => {
+        setMessage("")
+        client?.publish({destination: "/chat/message", body: message})
+    }
+
+    const activeUsers = (isConnected && _.filter(users || initUsers || [], u => u !== login)) || []
+
     return (
         <div>
-            <nav className="navbar bg-primary text-center justify-content-around">
-                <div className="col-4 d-inline-flex align-items-center">
-                    <a className="navbar-brand" href="#">
-                        <Logo width="42" height="42" className="header-icon"/>
-                    </a>
-                    <div className="fs-4 header-color">WebSocket Chat</div>
-                </div>
-                <div className="col-4 fs-4 text-end header-color">
-                    {state !== ConnectionState.CONNECTED
-                        ? (<div><i className="bi bi-circle-fill text-danger blink"/>&nbsp;Disconnected</div>)
-                        : (<div><i className="bi bi-circle-fill text-success"/>&nbsp;Connected</div>)}
-                </div>
-            </nav>
+            <Header isConnected={isConnected}/>
             <div className="container-fluid">
-                <div className="row vh-100 justify-content-evenly">
+                <div className="row content justify-content-evenly">
                     <div className="col-3">
-                        <div className="rounded-2 border user-box">
+                        <div className="user-container rounded-2 border my-3">
                             <div className="text-center fs-4 my-3">USERS</div>
                             <ul className="list-group overflow-auto user-list border-start border-2 border-warning rounded-0">
-                                {state === ConnectionState.CONNECTED &&
-                                    <li className="list-item d-flex align-items-center">
-                                        <i className="bi bi-circle-fill text-success"/>
-                                        <button className="btn btn-link" disabled>{login}</button>
-                                    </li>
-                                }
-                                {activeUsers.map(user =>
-                                    <li key={user} className="list-item d-flex align-items-center">
-                                        <i className="bi bi-circle-fill text-success"/>
-                                        <button className="btn btn-link">{user}</button>
-                                    </li>
-                                )}
+                                {isConnected && <User name={login}/>}
+                                {activeUsers.map(user => <User key={user} name={user}/>)}
                             </ul>
                         </div>
                     </div>
-                    <div className="col-5 border">
-                        TEST
+                    <div className="col-5">
+                        <div className="border rounded-2 my-3 py-1">
+                            <div className="chat-container">
+                                {messages.map(m => <MessageItem key={m.time} message={m} login={login}/>)}
+                                <div ref={messagesRef}/>
+                            </div>
+                        </div>
+                        <div className="message-container d-flex align-items-center ">
+                            <textarea className="form-control"
+                                      value={message}
+                                      onChange={e => setMessage(e.target.value)}/>
+                            <button type="button"
+                                    className="btn btn-primary mx-2"
+                                    disabled={!isConnected}
+                                    onClick={sendMessage}>
+                                SEND
+                            </button>
+                        </div>
                     </div>
                     <div className="col-3">
-                        <div className="rounded-2 border connection-box">
+                        <div className="connection-container rounded-2 border my-3">
                             <div className="text-center fs-4 my-3">CONNECTION</div>
                             <form className="container">
                                 <div className="row my-2">
@@ -76,6 +107,7 @@ const MainPage: FC = () => {
                                         <input id="address"
                                                type="text"
                                                className="form-control"
+                                               readOnly={isConnected}
                                                onChange={e => setAddress(e.target.value)}
                                                value={address}/>
                                     </div>
@@ -86,6 +118,7 @@ const MainPage: FC = () => {
                                         <input id="login"
                                                type="text"
                                                className="form-control"
+                                               readOnly={isConnected}
                                                onChange={e => setLogin(e.target.value)}
                                                value={login}/>
                                     </div>
@@ -93,7 +126,7 @@ const MainPage: FC = () => {
                                 <div className="row my-2 justify-content-center">
                                     <div className="col-4">
                                         <button className="btn btn-primary" type="button" onClick={handleClick}>
-                                            {state !== ConnectionState.CONNECTED ? "Connect" : "Disconnect"}
+                                            {isConnected ? "Disconnect" : "Connect"}
                                         </button>
                                     </div>
                                 </div>

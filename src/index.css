@@ -16,10 +16,13 @@ html, body {
     animation: blinker 3s infinite;
 }
 
-.connection-box,
-.user-box {
+.content {
+    height: calc(100vh - 68px);
+}
+
+.connection-container,
+.user-container {
     height: 212px;
-    margin-top: 1rem !important;
 }
 
 .user-list {
@@ -28,9 +31,39 @@ html, body {
     list-style: none;
 }
 
-.user-list > .list-item {
+.list-item {
     border: 1px;
     margin: 0 15px;
+}
+
+.user-label {
+    margin: 2px 10px;
+    font-weight: 500;
+}
+
+.chat-container {
+    width: 100%;
+    height: calc(100vh - 130px - 3rem);
+    overflow-y: auto;
+}
+
+.message-container {
+    width: 100%;
+}
+
+.message-item {
+    width: 90%;
+    min-height: 45px;
+    margin: 10px;
+    padding: 0 10px;
+}
+
+.current-user {
+    margin-left: auto;
+}
+
+.font-size-50 {
+    font-size: 50% !important;
 }
 
 @keyframes blinker {
