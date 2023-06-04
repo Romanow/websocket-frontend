@@ -29,8 +29,10 @@ const MainPage: FC = () => {
 
     useEffect(() => {
         if (state === ConnectionState.CONNECTED) {
-            client?.publish({destination: "/chat/init/users"})
-            client?.publish({destination: "/chat/init/messages"})
+            setTimeout(() => {
+                client?.publish({destination: "/chat/init/users"})
+                client?.publish({destination: "/chat/init/messages"})
+            }, 200)
         } else {
             setMessage("")
             setMessages([])
@@ -45,8 +47,8 @@ const MainPage: FC = () => {
     }, [initMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        console.log(`New message: [${newMessage}]`)
         if (newMessage) {
+            console.log(`New message: [${newMessage}]`)
             setMessages([...messages, newMessage!!])
         }
     }, [newMessage]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -58,8 +60,8 @@ const MainPage: FC = () => {
     const isConnected = state === ConnectionState.CONNECTED;
     const handleClick = () => toggleConnectionState(!isConnected)
     const sendMessage = () => {
-        setMessage("")
         client?.publish({destination: "/chat/message", body: message})
+        setMessage("")
     }
 
     const activeUsers = (isConnected && _.filter(users || initUsers || [], u => u !== login)) || []
