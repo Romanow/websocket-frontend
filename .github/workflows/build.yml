@@ -19,13 +19,6 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: static
-          path: build/
-          retention-days: 1
-
   test:
     name: Test UI
     runs-on: ubuntu-latest
@@ -78,11 +71,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: static
-          path: build/
 
       - name: Build and push to Docker Hub
         uses: docker/build-push-action@v3
