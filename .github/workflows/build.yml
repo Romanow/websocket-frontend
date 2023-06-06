@@ -19,6 +19,13 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: static
+          path: build/
+          retention-days: 1
+
   test:
     name: Test UI
     runs-on: ubuntu-latest
