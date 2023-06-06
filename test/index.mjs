@@ -19,13 +19,12 @@ const {argv} = yargs(hideBin(process.argv))
 
     console.log("Loading app...");
     await page.waitForSelector("[data-test-id='main-page']", {timeout: 5000});
-    await wait(1);
+    await wait(3);
     console.log("Application loaded. Running tests...");
 
     try {
         await chat(page);
         console.log("Tests ends successfully");
-        await wait(3)
     } catch (exception) {
         console.error(`Tests failed due ${exception.message}!`);
         throw exception;
