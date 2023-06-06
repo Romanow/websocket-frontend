@@ -1,20 +1,49 @@
 version: "3.9"
 services:
+  redis:
+    image: "bitnami/redis:7.0"
+    container_name: redis
+    environment:
+      ALLOW_EMPTY_PASSWORD: yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/bitnami/redis/data
+
+  artemis:
+    image: "romanowalex/artemis:2.28-arm"
+    container_name: artemis
+    environment:
+      ANONYMOUS_LOGIN: true
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    volumes:
+      - artemis-data:/var/lib/artemis-instance
+
   websocket-service:
-    image: romanowalex/websocket-service:v1.0
-    container_name: websocket-service
+    image: "romanowalex/websocket-service:v1.0"
+    container_name: "websocket-service"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONTEXT_PATH: /backend
     ports:
       - "8080:8080"
+    depends_on:
+      - redis
+      - artemis
 
   websocket-frontend:
     build: .
-    image: romanowalex/websocket-frontend:v1.0
+    image: "romanowalex/websocket-frontend:v1.0"
     container_name: websocket-frontend
     environment:
       BACKEND_HOST: websocket-service
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - websocket-service
+
+volumes:
+  redis-data:
+  artemis-data:

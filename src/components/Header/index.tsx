@@ -16,8 +16,18 @@ const Header: FC<HeaderProps> = ({isConnected}) => {
             </div>
             <div className="col-4 fs-4 text-end header-color">
                 {isConnected
-                    ? (<div><i className="bi bi-circle-fill text-success"/>&nbsp;Connected</div>)
-                    : (<div><i className="bi bi-circle-fill text-danger blink"/>&nbsp;Disconnected</div>)}
+                    ? (
+                        <div>
+                            <i className="bi bi-circle-fill text-success"/>&nbsp;
+                            <label data-test-id="connection-status">Connected</label>
+                        </div>
+                    )
+                    : (
+                        <div>
+                            <i className="bi bi-circle-fill text-danger blink"/>&nbsp;
+                            <label data-test-id="connection-status">Disconnected</label>
+                        </div>
+                    )}
             </div>
         </nav>
     )

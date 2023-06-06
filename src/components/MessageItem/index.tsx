@@ -8,12 +8,13 @@ type MessageItemProps = {
 }
 
 const MessageItem: FC<MessageItemProps> = ({message: {message, user, time}, login}) => {
+    const currentUserStyle = (user === login) && "current-user"
     return (
-        <div
-            className={"message-item border rounded-1 d-flex align-items-center justify-content-between " + ((user === login) && "current-user")}>
-            <label>{message}</label>
+        <div data-test-id="message-container"
+             className={`message-item border rounded-1 d-flex align-items-center justify-content-between ${currentUserStyle}`}>
+            <label data-test-id="message-data">{message}</label>
             <div className="text-end text-secondary font-size-50 ms-2">
-                <span>@{user}</span>
+                <span data-test-id="message-user">@{user}</span>
                 <br/>
                 <span>{moment(time).format("DD-MM-yyyy HH:mm:SS")}</span>
             </div>

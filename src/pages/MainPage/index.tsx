@@ -67,7 +67,7 @@ const MainPage: FC = () => {
     const activeUsers = (isConnected && _.filter(users || initUsers || [], u => u !== login)) || []
 
     return (
-        <div>
+        <div data-test-id="main-page">
             <Header isConnected={isConnected}/>
             <div className="container-fluid">
                 <div className="row content justify-content-evenly">
@@ -88,10 +88,12 @@ const MainPage: FC = () => {
                             </div>
                         </div>
                         <div className="message-container d-flex align-items-center ">
-                            <textarea className="form-control"
+                            <textarea data-test-id="message-field"
+                                      className="form-control"
                                       value={message}
                                       onChange={e => setMessage(e.target.value)}/>
                             <button type="button"
+                                    data-test-id="send-message"
                                     className="btn btn-primary mx-2"
                                     disabled={!isConnected}
                                     onClick={sendMessage}>
@@ -108,6 +110,7 @@ const MainPage: FC = () => {
                                     <div className="col-9">
                                         <input id="address"
                                                type="text"
+                                               data-test-id="address"
                                                className="form-control"
                                                readOnly={isConnected}
                                                onChange={e => setAddress(e.target.value)}
@@ -119,6 +122,7 @@ const MainPage: FC = () => {
                                     <div className="col-9">
                                         <input id="login"
                                                type="text"
+                                               data-test-id="login"
                                                className="form-control"
                                                readOnly={isConnected}
                                                onChange={e => setLogin(e.target.value)}
@@ -127,7 +131,10 @@ const MainPage: FC = () => {
                                 </div>
                                 <div className="row my-2 justify-content-center">
                                     <div className="col-4">
-                                        <button className="btn btn-primary" type="button" onClick={handleClick}>
+                                        <button type="button"
+                                                data-test-id="connect"
+                                                className="btn btn-primary"
+                                                onClick={handleClick}>
                                             {isConnected ? "Disconnect" : "Connect"}
                                         </button>
                                     </div>
