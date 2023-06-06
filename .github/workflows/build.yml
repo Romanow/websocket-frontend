@@ -22,7 +22,7 @@ jobs:
   test:
     name: Test UI
     runs-on: ubuntu-latest
-    needs: [ build, test ]
+    needs: build
     steps:
       - uses: actions/checkout@v3
 
@@ -50,7 +50,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./test
-        run: node index.mjs
+        run: node index.mjs --headless
 
       - name: Stop containers
         if: always()
