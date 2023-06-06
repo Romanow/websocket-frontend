@@ -11,7 +11,7 @@ services:
       - redis-data:/bitnami/redis/data
 
   artemis:
-    image: "romanowalex/artemis:2.28-arm"
+    image: "romanowalex/artemis:2.28.0-arm"
     container_name: artemis
     environment:
       ANONYMOUS_LOGIN: true
